@@ -105,6 +105,7 @@
     );
     $record = mysqli_query($db, $sql);
     $table = mysqli_fetch_assoc($record);
+    //.で文字の連結をしている
     $tweet = '>> @'.$table['nick_name'].' '.$table['tweet'];
   }
   // htmlspecialcharsのショートカット
@@ -156,13 +157,19 @@
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="index.php"><span class="strong-title"><i class="fa fa-twitter-square"></i> Seed SNS</span></a>
+              <a class="navbar-brand" href="index2.php"><span class="strong-title"><i class="fa fa-twitter-square"></i> Seed SNS</span></a>
           </div>
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav navbar-right">
+              <li><a href="user_edit.php">ユーザ情報編集</a></li>
                 <li><a href="logout.php">ログアウト</a></li>
+
               </ul>
+          </div>
+          
+                
+              
           </div>
           <!-- /.navbar-collapse -->
       </div>
@@ -183,6 +190,8 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">つぶやき</label>
               <div class="col-sm-8">
+
+
                 <?php if(isset($tweet)): ?>
                   <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"><?php echo h($tweet); ?></textarea>
                   <input type="hidden" name="reply_tweet_id" value="<?php echo h($_REQUEST['res']); ?>">
@@ -221,9 +230,13 @@
 
 
       <div class="col-md-8 content-margin-top">
+
+
         <?php while($tweet = mysqli_fetch_assoc($tweets)): ?>
           <div class="msg">
             <img src="member_picture/<?php echo h($tweet['picture_path']); ?>" width="48" height="48">
+
+
             <p>
               <?php echo makeLink(h($tweet['tweet'])); ?>
               <span class="name">
@@ -231,10 +244,14 @@
                </span>
               [<a href="index2.php?res=<?php echo h($tweet['tweet_id']); ?>">Re</a>]
             </p>
+
+
             <p class="day">
               <a href="view.php?id=<?php echo h($tweet['tweet_id']); ?>">
                 <?php echo h($tweet['created']); ?>
               </a>
+
+
               <?php if($tweet['reply_tweet_id'] > 0): ?>
                 <a href="view.php?id=<?php echo h($tweet['reply_tweet_id']); ?>"> | 返信元のつぶやき</a>
               <?php endif; ?>
@@ -244,6 +261,9 @@
                 [<a href="delete.php?id=<?php echo h($tweet['tweet_id']); ?>" style="color: #F33;">削除</a>]
               <?php endif; ?>
             </p>
+
+
+
           </div>
         <?php endwhile; ?>
       </div>

@@ -1,8 +1,8 @@
 <?php
   require('dbconnect.php');
   session_start();
-  echo "<br>";
-  echo "<br>";
+  // echo "<br>";
+  // echo "<br>";
 
 
   // ログインボタンを押した際に読まれる
@@ -32,7 +32,7 @@
       //オブジェクトがたのデータを配列型に変換して一件取得
       //ここでログインできるユーザーかどうかを判定
       if ($table = mysqli_fetch_assoc($record)) {
-        var_dump($table);
+        // var_dump($table);
         // データが存在したとき (ログイン成功の処理)
         
         // 次のページでログイン判定をするために使用するidをSESSIONで管理
@@ -103,7 +103,7 @@
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="index.php"><span class="strong-title"><i class="fa fa-twitter-square"></i> Seed SNS</span></a>
+              <a class="navbar-brand" href="index2.php"><span class="strong-title"><i class="fa fa-twitter-square"></i> Seed SNS</span></a>
           </div>
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">

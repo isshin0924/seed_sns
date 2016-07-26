@@ -6,24 +6,28 @@
     header('Location: index2.php');
     exit();
   }
-
-
+  // アップデート
+  if (!empty($_POST)) {
+    if ($_POST['tweet'] != '') {
+      $sql = sprintf('UPDATE `tweets` SET `tweet`="%s" WHERE `tweet_id`=%d',
+          mysqli_real_escape_string($db, $_POST['tweet']),
+          mysqli_real_escape_string($db, $_REQUEST['id'])
+        );
+      mysqli_query($db, $sql) or die(mysqli_error($db));
+      header('Location: index2.php');
+      exit();
+    }
+  }
   // 投稿を取得する
-  $sql = sprintf(
-'SELECT m.nick_name,
-        m.picture_path,
-        t.*
-FROM `tweets` t,
-     `members` m
-WHERE t.member_id = m.member_id
-  AND t.tweet_id = %d
-ORDER BY t.created DESC', 
-mysqli_real_escape_string($db,$_REQUEST['id']));
+  $sql = sprintf('SELECT m.nick_name, m.picture_path, t.* FROM `tweets` t, `members` m WHERE t.member_id = m.member_id AND t.tweet_id = %d ORDER BY t.created DESC',
+    mysqli_real_escape_string($db, $_REQUEST['id'])
+  );
   $tweets = mysqli_query($db, $sql) or die(mysqli_error($db));
+  // htmlspecialcharsのショートカット
+  function h($value){
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+  }
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -76,36 +80,27 @@ mysqli_real_escape_string($db,$_REQUEST['id']));
   <div class="container">
     <div class="row">
       <div class="col-md-4 col-md-offset-4 content-margin-top">
-
-
-
       <?php if($tweet = mysqli_fetch_assoc($tweets)): ?>
         <div class="msg">
-          <img src="member_picture/<?php echo htmlspecialchars($tweet['picture_path'], ENT_QUOTES, 'UTF-8') ?>" width="100" height="100">
-          <p>投稿者 : <span class="name"><?php echo htmlspecialchars($tweet['nick_name'], ENT_QUOTES, 'UTF-8'); ?></span></p>
-
-          <p class="day">
-            <?php echo htmlspecialchars($tweet['created'], ENT_QUOTES, 'UTF-8') ?>
-            
-          </p>
-          
-          <p>
-            つぶやき : <br>
-            <?php echo htmlspecialchars($tweet['tweet'], ENT_QUOTES, 'UTF-8') ?>
-          </p>
-          
+          <form action="" method="post">
+            <img src="member_picture/<?php echo htmlspecialchars($tweet['picture_path'], ENT_QUOTES, 'UTF-8') ?>" width="100" height="100">
+            <p>投稿者 : <span class="name"><?php echo htmlspecialchars($tweet['nick_name'], ENT_QUOTES, 'UTF-8'); ?></span></p>
+            <p>
+              つぶやき : <br>
+              <textarea name="tweet" cols="26" rows="2"><?php echo h($tweet['tweet']); ?></textarea>
+             
+              <input type="hidden" name="tweet_id" value="<?php echo h($tweet['tweet_id']); ?>">
+            </p>
+            <p class="day">
+              <?php echo htmlspecialchars($tweet['created'], ENT_QUOTES, 'UTF-8') ?>
+              <input type="submit" value="更新" class="btn btn-default btn-xs">
+            </p>
+          </form>
         </div>
-
-
       <?php else: ?>
         <p>その投稿は削除されたか、URLが間違っています。</p>
-
-
-
       <?php endif; ?>
         <a href="index2.php">&laquo;&nbsp;一覧へ戻る</a>
-
-
       </div>
     </div>
   </div>
