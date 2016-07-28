@@ -26,7 +26,7 @@
       
         mysqli_real_escape_string($db, $_SESSION['join']['nick_name']),
         mysqli_real_escape_string($db, $_SESSION['join']['email']),
-        mysqli_real_escape_string($db, sha1($_SESSION['join']['password'])),
+        mysqli_real_escape_string($db, $_SESSION['join']['password']),
         mysqli_real_escape_string($db, $_SESSION['join']['picture'])
       );
 

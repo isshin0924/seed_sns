@@ -2,6 +2,10 @@
   // DBやセッションの設定
   require('dbconnect.php');
   session_start();
+  var_dump($_POST);
+
+
+
   // ログイン判定
   if (isset($_SESSION['id']) && $_SESSION['time'] + 3600 > time()) {
     $_SESSION['time'] = time();
@@ -14,10 +18,15 @@
     header('Location: login.php');
     exit();
   }
+
+
+
   $error = Array();
-  // $_POSTがある場合 (更新ボタンが押された際の処理)
+  // 更新ボタンが押された際の処理
   if (!empty($_POST)) {
   
+
+
     // バリデーション
     if ($_POST['nick_name'] == '') {
       $error['nick_name'] = 'blank';
@@ -26,19 +35,59 @@
       $error['email'] = 'blank';
     }
     if ($_POST['password'] == '') {
-      $error['password'] = 'blank';
+        $error['password'] = 'blank';}
     // DBに登録されているパスワードと入力されたパスワードが一致するかどうか
-    } else if (sha1($_POST['password']) != $member['password']) {
+     else if ($_POST['password'] != $member['password']) {
       $error['password'] = 'incorrect';
     }
-    if (!empty($_POST['new_password'])) {
-      if ($_POST['new_password'] < 4) {
-        $error['new_password'] = 'length';
-      }
-      if ($_POST['new_password'] != $_POST['confirm_password']) {
-        $error['new_password'] = 'incorrect';
-      }
+
+
+    if ($_POST['new_password'] =='') {
+      $error['sql'] = 'sqlerror'; 
+    }else if($_POST['new_password'] < 4){
+      $error['new_password'] = 'length';
+    }else if($_POST['new_password'] == $_POST['confirm_password']){
+      $error['new_password'] = 'incorrect';
     }
+
+
+      // if (isset($_POST['new_password'])) {
+      //   if ($_POST['new_password'] > 4) {
+          
+      //     if ($_POST['new_password'] == $_POST['confirm_password']) {
+
+      //       $sql = sprintf('UPDATE `members` SET `password`="%s" WHERE `member_id`=%d',
+      //         mysqli_real_escape_string($db, $_POST['new_password']),
+      //         mysqli_real_escape_string($db, $member['member_id'])
+      //       );
+      //       mysqli_query($db, $sql) or die(mysqli_error($db));
+      //     }else{
+      //       $error['new_password'] = 'incorrect';
+      //     }
+
+          
+      //   } else {
+      //     $error['new_password'] = 'length';
+      //   }
+
+        
+      // } else {
+      //   $error['sql'] = 'sqlerror';
+      // }
+
+
+      // if (!empty($_POST['new_password'])) {
+      //   if ($_POST['new_password'] < 4 ) {
+      //     $error['new_password'] = 'length';
+      //   }
+      //  //  if ($_POST['new_password'] != $_POST['confirm_password']) {
+      //  //    $error['new_password'] = 'incorrect';
+      //  // }
+      //     }
+
+
+
+
     $fileName = $_FILES['picture_path']['name'];
     if (!empty($fileName)) {
       $ext = substr($fileName, -3);
@@ -46,6 +95,9 @@
         $error['picture_path'] = 'type';
       }
     }
+
+
+
     // 重複アカウントのチェック
     if (empty($error)) {
       if ($_POST['email'] != $member['email']) {
@@ -60,6 +112,9 @@
         }
       }
     }
+
+
+
     // エラーがなければ
     if (empty($error)) {
       // 画像が選択されていれば
@@ -70,23 +125,50 @@
       } else {
         $picture = $member['picture_path'];
       }
+
       // アップデート
-      $sql = sprintf('UPDATE `members` SET `nick_name`="%s", `email`="%s", `password`="%s", `picture_path`="%s", modified=NOW() WHERE `member_id`=%d',
+      echo 'hoge1';
+      if (!empty($_POST['new_password'])) {
+
+        $sql = sprintf('UPDATE `members` SET `password`="%s" WHERE `member_id`=%d',
+            mysqli_real_escape_string($db, $_POST['new_password']),
+            mysqli_real_escape_string($db, $member['member_id'])
+          );
+          mysqli_query($db, $sql) or die(mysqli_error($db));
+        
+      }else if (empty($_POST['new_password'])) {
+        $sql = sprintf('UPDATE `members` SET `nick_name`="%s", `email`="%s", `picture_path`="%s", modified=NOW() WHERE `member_id`=%d',
           mysqli_real_escape_string($db, $_POST['nick_name']),
           mysqli_real_escape_string($db, $_POST['email']),
-          mysqli_real_escape_string($db, sha1($_POST['new_password'])),
           mysqli_real_escape_string($db, $picture),
           mysqli_real_escape_string($db, $member['member_id'])
         );
       mysqli_query($db, $sql) or die(mysqli_error($db));
+      }
+
+
+
+      //
+        // $sql = sprintf('UPDATE `members` SET `nick_name`="%s", `email`="%s", `picture_path`="%s", modified=NOW() WHERE `member_id`=%d',
+        //     mysqli_real_escape_string($db, $_POST['nick_name']),
+        //     mysqli_real_escape_string($db, $_POST['email']),
+        //     mysqli_real_escape_string($db, $picture),
+        //     mysqli_real_escape_string($db, $member['member_id'])
+        //   );
+        // mysqli_query($db, $sql) or die(mysqli_error($db));
     }
-  }
+    }
+
+
   // ユーザー情報の取得
   $sql = sprintf('SELECT * FROM `members` WHERE `member_id`=%d',
       mysqli_real_escape_string($db, $_SESSION['id'])
     );
   $record = mysqli_query($db, $sql) or die(mysqli_error($db));
   $member = mysqli_fetch_assoc($record);
+
+
+
   // htmlspecialcharsのショートカット
   function h($value){
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -150,19 +232,26 @@
         <form method="post" action="" class="form-horizontal" role="form" enctype="multipart/form-data">
 
 
-        
+
           <!-- ニックネーム -->
           <div class="form-group">
             <label class="col-sm-4 control-label">ニックネーム</label>
             <div class="col-sm-8">
+
+
             <?php if (isset($_POST['nick_name'])): ?>
               <input type="text" name="nick_name" class="form-control" placeholder="例： Seed kun" value="<?php echo htmlspecialchars($_POST['nick_name'], ENT_QUOTES, 'UTF-8'); ?>">
+
             <?php else: ?>
               <input type="text" name="nick_name" class="form-control" placeholder="例： Seed kun" value="<?php echo h($member['nick_name']); ?>">
             <?php endif; ?>
+
+
               <?php if (isset($error['nick_name']) && $error['nick_name'] == 'blank'): ?>
                 <p class="error">* ニックネームを入力してください。</p>
               <?php endif; ?>
+
+
             </div>
           </div>
 
@@ -172,14 +261,21 @@
           <div class="form-group">
             <label class="col-sm-4 control-label">メールアドレス</label>
             <div class="col-sm-8">
+
+
             <?php if (isset($_POST['email'])): ?>
               <input type="email" name="email" class="form-control" placeholder="例： seed@nex.com" value="<?php echo htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'); ?>">
+
             <?php else: ?>
               <input type="email" name="email" class="form-control" placeholder="例： seed@nex.com" value="<?php echo h($member['email']); ?>">
             <?php endif; ?>
+
+
             <?php if (isset($error['email']) && $error['email'] == 'blank'): ?>
               <p class="error">* メールアドレスを入力してください。</p>
             <?php endif; ?>
+
+
             <?php if (isset($error['email']) && $error["email"] == 'duplicate'): ?>
                 <p class="error">* 指定されたメールアドレスはすでに登録されています。</p>
             <?php endif; ?>
@@ -192,14 +288,22 @@
           <div class="form-group">
             <label class="col-sm-4 control-label">現在のパスワード</label>
             <div class="col-sm-8">
+
+
             <?php if (isset($_POST['password'])): ?>
               <input type="password" name="password" class="form-control" placeholder="" value="<?php echo htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8'); ?>">
+
+
             <?php else: ?>
               <input type="password" name="password" class="form-control" placeholder="" value="">
             <?php endif; ?>
+
+
             <?php if (isset($error['password']) && $error['password'] == 'blank'): ?>
               <p class="error">* パスワードを入力してください。</p>
             <?php endif; ?>
+
+            
             <?php if (isset($error['password']) && $error['password'] == 'incorrect'): ?>
               <p class="error">* パスワードが間違っています。</p>
             <?php endif; ?>
@@ -213,24 +317,29 @@
             <label class="col-sm-4 control-label">新規パスワード</label>
             <div class="col-sm-8">
               <input type="password" name="new_password" class="form-control" placeholder="" value="">
+
+
               <?php if (isset($error['new_password']) && $error['new_password'] == 'length'): ?>
                 <p class="error">* パスワードは4文字以上で入力してください。</p>
               <?php endif; ?>
-              <?php if (isset($error['new_password']) && $error['new_password'] == 'incorrect'): ?>
+
+
+                <?php if (isset($error['new_password']) && $error['new_password'] == 'incorrect'): ?>
                 <p class="error">* 確認用パスワードと一致しません。</p>
               <?php endif; ?>
+
+
             </div>
           </div>
 
 
-
           <!-- 確認用パスワード -->
-          <div class="form-group">
+           <div class="form-group">
             <label class="col-sm-4 control-label">確認用パスワード</label>
             <div class="col-sm-8">
               <input type="password" name="confirm_password" class="form-control" placeholder="" value="">
             </div>
-          </div>
+          </div> 
 
 
 
@@ -243,13 +352,11 @@
               <?php if (isset($error['picture_path']) && $error['picture_path'] == 'type'): ?>
                 <p class="error">* プロフィール写真には「.gif」「.jpg」「.png」の画像を指定してください。</p>
               <?php endif; ?>
-              <?php if (!empty($error)): ?>
-                <p class="error">* 画像を指定していた場合は恐れ入りますが、画像を改めて指定してください。</p>
-              <?php endif; ?>
+              
             </div>
           </div>
 
-          <input type="submit" class="btn btn-default" value="確認画面へ">
+          <input type="submit" class="btn btn-default" value="確認画面へ" >
         </form>
       </div>
     </div>

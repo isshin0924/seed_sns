@@ -14,7 +14,7 @@
         //入力されたデータの中にある特殊文字(@,#,%,etc..)をただの文字として認識させるための
             //mysqli_real_escape_string();
         mysqli_real_escape_string($db, $_POST['email']),
-        mysqli_real_escape_string($db, sha1($_POST['password']))
+        mysqli_real_escape_string($db, $_POST['password'])
       );
       echo $sql;
 

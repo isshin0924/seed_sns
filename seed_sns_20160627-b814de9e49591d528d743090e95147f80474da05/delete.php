@@ -2,9 +2,10 @@
 	session_start();
 	require('dbconnect.php');
 
+
 	//ログイン判定
 	if (isset($_SESSION['id'])) {
-		# code...
+		# URLのパラメータ上にあるid
 		$id = $_REQUEST['id'];
 
 		// パラメータのidの値を元に削除したいデータを取得

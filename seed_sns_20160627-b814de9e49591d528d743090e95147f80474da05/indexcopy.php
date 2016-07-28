@@ -40,35 +40,35 @@
   // URLのパラメータにpageが存在していれば$pageに代入
   if (isset($_REQUEST['page'])) {
     $page = $_REQUEST['page'];
-   
+    // echo 'page1 = ' . $page . '<br>';
   }
   
   if ($page == '') {
     $page = 1;
-   
+    // echo 'page2 = ' . $page . '<br>';
   }
   // 0.4などの数値をユーザーが直接URLに入れたときのため最小値の1と比較する
-  $page = max($page, 1);//最低でも1が$pageにはいる
+  $page = max($page, 1);
   // max()関数はカッコ内に与えられた数値のうち、一番大きい数値を返す関数
-
+  // echo 'page3 = ' . $page . '<br>';
   // 最終ページを取得する
   $sql = 'SELECT COUNT(*) AS cnt FROM `tweets`';
-  $recordSet = mysqli_query($db, $sql) or die(mysqli_error($db));
+  $recordSet = mysqli_query($db, $sql);
   $table = mysqli_fetch_assoc($recordSet);
-  
+  // var_dump($table);
   // 最大ページ数をデータの数÷5で取得
   $maxPage = ceil($table['cnt'] / $countNum);
   // ceil()関数は指定した数値を切り上げて返す
-
+  // echo 'maxPage = ' . $maxPage . '<br>';
   // パラメータに最大ページ数以上の数値が入力された場合に最大ページ数で上書きするため
   $page = min($page, $maxPage);
   // min()関数はカッコ内に与えられた数値のうち、一番小さい数値を返す関数
-
+  // echo 'page4 = ' . $page . '<br>';
   // DB内tweetsテーブルデータの取得開始場所を指定する変数$startを定義
   $start = ($page - 1) * $countNum;
-  
-  $start = max(0, $start);//最小単位0 →１軒目からデータを取得する(1ページ目のデータ)
-
+  // echo 'start1 = ' . $start . '<br>';
+  $start = max(0, $start);
+  // echo 'start2 = ' . $start . '<br>';
 
 
   //2つのデータベースの中身を合体させて使用するためのSQL
@@ -83,12 +83,21 @@
             $start,
             $countNum
           );
-//LIMIT　何軒目からか、何件取得するか
+  // LIMIT句の構文
+  // LIMIT データ取得開始位置, データ取得件数
+  // LIMIT 0,5 ← 最初から5件取得
+  // LIMIT 5,5 ← 6件目から5件取得
+  // LIMIT 10,20 ← 11件目から20件取得
 
 
 
   $tweets = mysqli_query($db, $sql) or die(mysqli_error($db));
- 
+  // while ($tweet = mysqli_fetch_assoc($tweets)) {
+  //   var_dump($tweet);
+  //   echo $tweet['nick_name'];
+  //   echo $tweet['tweet'];
+  //   echo '<hr>';
+  // }
   // 返信の場合
   if (isset($_REQUEST['res'])) {
     $sql = sprintf('SELECT m.nick_name, m.picture_path, t.* FROM `tweets` t, `members` m WHERE t.member_id = m.member_id AND t.tweet_id = %d ORDER BY t.created DESC',
@@ -103,7 +112,10 @@
   function h($value){
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
   }
-  
+  // 実装した機能を保ちつつ、コードの可動性をあげることを「リファクタリング」と言います。
+  // ①機能をどんな形でも良いので実装する
+  // ②コードの可動性をあげるために修正します
+  // ③修正した状態で機能がしっかりと動くか確認
   // 本文内のURLにリンクを設定します
   function makeLink($value){
     return mb_ereg_replace('(https?)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)','<a href="\1\2" target="_blank">\1\2</a>', $value);
