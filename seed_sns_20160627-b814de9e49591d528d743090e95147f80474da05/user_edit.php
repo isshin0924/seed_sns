@@ -22,6 +22,7 @@
 
 
   $error = Array();
+  $error2 = Array();
   // 更新ボタンが押された際の処理
   if (!empty($_POST)) {
   
@@ -41,14 +42,14 @@
       $error['password'] = 'incorrect';
     }
 
+    if (!empty($_POST['new_password'])) {
+      if($_POST['new_password'] != $_POST['confirm_password']){
+      $error['new_password'] = 'incorrect'; 
+      // if ($_POST['new_password'] < 4) {}
+          $error['new_password'] = 'length';
+  }
+  }
 
-    if ($_POST['new_password'] =='') {
-      $error['sql'] = 'sqlerror'; 
-    }else if($_POST['new_password'] < 4){
-      $error['new_password'] = 'length';
-    }else if($_POST['new_password'] == $_POST['confirm_password']){
-      $error['new_password'] = 'incorrect';
-    }
 
 
       // if (isset($_POST['new_password'])) {
@@ -85,9 +86,7 @@
       //  // }
       //     }
 
-
-
-
+  
     $fileName = $_FILES['picture_path']['name'];
     if (!empty($fileName)) {
       $ext = substr($fileName, -3);
@@ -128,10 +127,15 @@
 
       // アップデート
       echo 'hoge1';
+
+      //new_passwordがある場合は
       if (!empty($_POST['new_password'])) {
 
-        $sql = sprintf('UPDATE `members` SET `password`="%s" WHERE `member_id`=%d',
+        $sql = sprintf('UPDATE `members` SET `nick_name`="%s", `email`="%s", `password`="%s" ,`picture_path`="%s", modified = NOW() WHERE `member_id`=%d',
+           mysqli_real_escape_string($db, $_POST['nick_name']),
+          mysqli_real_escape_string($db, $_POST['email']),
             mysqli_real_escape_string($db, $_POST['new_password']),
+            mysqli_real_escape_string($db, $picture),
             mysqli_real_escape_string($db, $member['member_id'])
           );
           mysqli_query($db, $sql) or die(mysqli_error($db));
