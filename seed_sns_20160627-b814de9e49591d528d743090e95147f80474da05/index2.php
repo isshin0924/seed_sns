@@ -45,17 +45,29 @@
   
   if ($page == '') {
     $page = 1;
-   
+  
   }
   // 0.4などの数値をユーザーが直接URLに入れたときのため最小値の1と比較する
-  $page = max($page, 1);//最低でも1が$pageにはいる
+  $page = max($page, 1);
   // max()関数はカッコ内に与えられた数値のうち、一番大きい数値を返す関数
 
   // 最終ページを取得する
-  $sql = 'SELECT COUNT(*) AS cnt FROM `tweets`';
-  $recordSet = mysqli_query($db, $sql) or die(mysqli_error($db));
-  $table = mysqli_fetch_assoc($recordSet);
+  if (!empty($_REQUEST['search_word'])) {
+    // 検索ボタンを押された時
+    $sql = sprintf('SELECT COUNT(*) 
+                    AS cnt 
+                    FROM `tweets` 
+                    WHERE tweet 
+                    LIKE "%%%s%%"', 
+                      mysqli_real_escape_string($db, $_REQUEST['search_word'])
+      );
+  } else {
+    $sql = 'SELECT COUNT(*) AS cnt FROM `tweets`';
+  }
   
+  $recordSet = mysqli_query($db, $sql);
+  $table = mysqli_fetch_assoc($recordSet);
+ 
   // 最大ページ数をデータの数÷5で取得
   $maxPage = ceil($table['cnt'] / $countNum);
   // ceil()関数は指定した数値を切り上げて返す
@@ -63,26 +75,34 @@
   // パラメータに最大ページ数以上の数値が入力された場合に最大ページ数で上書きするため
   $page = min($page, $maxPage);
   // min()関数はカッコ内に与えられた数値のうち、一番小さい数値を返す関数
-
+  
   // DB内tweetsテーブルデータの取得開始場所を指定する変数$startを定義
   $start = ($page - 1) * $countNum;
-  
-  $start = max(0, $start);//最小単位0 →１軒目からデータを取得する(1ページ目のデータ)
 
+  $start = max(0, $start);
 
-
-  //2つのデータベースの中身を合体させて使用するためのSQL
-  //DESCで降順に表示する
-  $sql = sprintf('SELECT m.nick_name, m.picture_path, t.* 
-          -- as句で置き換えられてる
-          FROM `tweets` t, `members` m 
-          -- t.memberとm.memberを紐付けるために=で一致する場合
-          WHERE t.member_id=m.member_id 
-          ORDER BY t.created DESC
-          LIMIT %d,%d',
-            $start,
-            $countNum
-          );
+  // 検索ボタンが押された時
+  if (!empty($_REQUEST['search_word'])) {
+    $sql = sprintf('SELECT m.nick_name, m.picture_path, t.* 
+            FROM `tweets` t, `members` m 
+            WHERE t.member_id=m.member_id 
+            AND t.tweet LIKE "%%%s%%"
+            ORDER BY t.created DESC
+            LIMIT %d,%d',
+              mysqli_real_escape_string($db, $_REQUEST['search_word']),
+              $start,
+              $countNum
+            );
+  } else {
+    $sql = sprintf('SELECT m.nick_name, m.picture_path, t.* 
+            FROM `tweets` t, `members` m 
+            WHERE t.member_id=m.member_id 
+            ORDER BY t.created DESC
+            LIMIT %d,%d',
+              $start,
+              $countNum
+            );
+  }
 //LIMIT　何軒目からか、何件取得するか
 
 
@@ -193,7 +213,7 @@
 
           <ul class="paging">
             <input type="submit" class="btn btn-info" value="つぶやく">
-                
+        
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <?php if($page > 1): ?>
                   <!-- パラメータpageの値が1以上であれば「前」ボタンを表示 -->
@@ -218,6 +238,23 @@
 
 
       <div class="col-md-8 content-margin-top">
+
+
+       <!-- 検索窓設置 -->
+        <form method="get" action="" class="form-horizontal" role="form">
+          
+          <?php if(!empty($_REQUEST['search_word'])): ?>
+            <input type="text" name="search_word" 
+            value="<?php echo h($_REQUEST['search_word']); ?>">
+          <?php else: ?>
+            <input type="text" name="search_word" value="">
+          <?php endif; ?>
+          
+          <input type="submit" class="btn btn-success btn-xs" value="検索">
+        </form>
+
+
+
 
 
         <?php while($tweet = mysqli_fetch_assoc($tweets)): ?>

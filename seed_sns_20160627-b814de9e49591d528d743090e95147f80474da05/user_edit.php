@@ -22,7 +22,7 @@
 
 
   $error = Array();
-  $error2 = Array();
+  //$error2 = Array();
   // 更新ボタンが押された際の処理
   if (!empty($_POST)) {
   
@@ -41,14 +41,30 @@
      else if ($_POST['password'] != $member['password']) {
       $error['password'] = 'incorrect';
     }
+//自分なりに作ってみたが４文字のところでエラーを起こすので
+    // ４文字エラーのところはつけていない
+  //   if (!empty($_POST['new_password'])) {
+  //     if($_POST['new_password'] != $_POST['confirm_password']){
+  //     $error['new_password'] = 'incorrect'; 
+  //         // 
+  // }$error['new_password'] = 'length';
+  // }
 
-    if (!empty($_POST['new_password'])) {
-      if($_POST['new_password'] != $_POST['confirm_password']){
-      $error['new_password'] = 'incorrect'; 
-      // if ($_POST['new_password'] < 4) {}
-          $error['new_password'] = 'length';
+    //
+if (!empty($_POST['new_password'])) {
+  
+  if (strlen($_POST['new_password']) < 4) {
+    
+    $error['new_password'] = 'length';
   }
+  if ($_POST['new_password'] != $_POST['confirm_password']) {
+    
+    $error['new_password'] = 'incorrect';
   }
+}else{
+    $_POST['new_password'] = $_POST['password'];
+  }
+
 
 
 
