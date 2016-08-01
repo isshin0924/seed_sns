@@ -119,6 +119,7 @@
     //.で文字の連結をしている
     $tweet = '>> @'.$table['nick_name'].' '.$table['tweet'];
   }
+
   // htmlspecialcharsのショートカット
   function h($value){
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -284,7 +285,11 @@
               <?php if($member['member_id'] == $tweet['member_id']): ?>
                 [<a href="edit.php?id=<?php echo h($tweet['tweet_id']); ?>" style="color: #00994C;">編集</a>]
                 [<a href="delete.php?id=<?php echo h($tweet['tweet_id']); ?>" style="color: #F33;">削除</a>]
+               <!--  [<a href="like.php?id=<?php echo h($tweet['tweet_id']); ?>" style="color:yellow;">いいね</a>] -->
               <?php endif; ?>
+               [<a href="like.php?id=<?php echo h($tweet['tweet_id']); ?>" style="color:orange;">いいね</a>]
+
+
             </p>
 
 

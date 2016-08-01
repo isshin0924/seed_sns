@@ -41,16 +41,19 @@
      else if ($_POST['password'] != $member['password']) {
       $error['password'] = 'incorrect';
     }
-//自分なりに作ってみたが４文字のところでエラーを起こすので
+//
+  //自分なりに作ってみたが４文字のところでエラーを起こすので
     // ４文字エラーのところはつけていない
-  //   if (!empty($_POST['new_password'])) {
-  //     if($_POST['new_password'] != $_POST['confirm_password']){
-  //     $error['new_password'] = 'incorrect'; 
-  //         // 
-  // }$error['new_password'] = 'length';
-  // }
+    //   if (!empty($_POST['new_password'])) {
+    //     if($_POST['new_password'] != $_POST['confirm_password']){
+    //     $error['new_password'] = 'incorrect'; 
+    //         // 
+    // }$error['new_password'] = 'length';
+    // }
 
     //
+
+    
 if (!empty($_POST['new_password'])) {
   
   if (strlen($_POST['new_password']) < 4) {
@@ -67,7 +70,7 @@ if (!empty($_POST['new_password'])) {
 
 
 
-
+//
       // if (isset($_POST['new_password'])) {
       //   if ($_POST['new_password'] > 4) {
           
@@ -115,6 +118,7 @@ if (!empty($_POST['new_password'])) {
 
     // 重複アカウントのチェック
     if (empty($error)) {
+      // メールアドレスが変更された
       if ($_POST['email'] != $member['email']) {
         $sql = sprintf(
             'SELECT COUNT(*) AS cnt FROM members WHERE email="%s"',
