@@ -2,22 +2,20 @@
   session_start();
   require('dbconnect.php');
   // URLの末尾にあるパラメータ (?id=値) の値が空であればindex.phpに強制遷移
-  if (empty($_REQUEST['id'])) {
-    header('Location: index2.php');
-    exit();
-  }
+  
 
 
   // 投稿を取得する
   $sql = sprintf(
-'SELECT m.nick_name,
-        m.picture_path,
+'SELECT l.member_id,
+        l.tweet_id,
         t.*
 FROM `tweets` t,
-     `members` m
-WHERE t.member_id = m.member_id
-  AND t.tweet_id = %d
+     `like` l
+WHERE l.member_id = %d   
+  AND l.tweet_id = %d
 ORDER BY t.created DESC', 
+mysqli_real_escape_string($db,$_SESSION['id']),
 mysqli_real_escape_string($db,$_REQUEST['id']));
   $tweets = mysqli_query($db, $sql) or die(mysqli_error($db));
 
@@ -89,9 +87,7 @@ mysqli_real_escape_string($db,$_REQUEST['id']));
 
           <p class="day">
             <?php echo htmlspecialchars($tweet['created'], ENT_QUOTES, 'UTF-8') ?>
-            <?php if (): ?>
-              
-            <?php endif ?>
+            
             <!-- [<a href="like.php?id=<?php echo h($tweet['tweet_id']); ?>" style="color:orange;">いいね</a>] -->
             <form action="like.php" method="POST">
             
